@@ -32,7 +32,11 @@ class CodingAgentMCPServer {
       {
         name: 'coding-agent-mcp',
         version: '1.0.1',
+      },
+      {
+        capabilities: { tools: {} },
       }
+      
     );
 
     this.fileOps = new FileOperations();
