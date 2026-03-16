@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
@@ -12,6 +11,7 @@ import { FileOperations } from './tools/file-operations.js';
 import { TerminalOperations } from './tools/terminal-operations.js';
 import { SearchOperations } from './tools/search-operations.js';
 import { UtilityOperations } from './tools/utility-operations.js';
+import { TransportFactory } from './factory/implementations/TransportFactory.js';
 
 /**
  * Coding Agent MCP Server
@@ -32,7 +32,11 @@ class CodingAgentMCPServer {
       {
         name: 'coding-agent-mcp',
         version: '1.0.1',
+      },
+      {
+        capabilities: { tools: {} },
       }
+      
     );
 
     this.fileOps = new FileOperations();
@@ -93,12 +97,15 @@ class CodingAgentMCPServer {
     });
   }
 
-  async start(): Promise<void> {
-    const transport = new StdioServerTransport();
+  async start(type: string): Promise<void> {
+    const transportFactory = new TransportFactory();
+    const transport = transportFactory.createTransport(type);
     await this.server.connect(transport);
     console.error('Coding Agent MCP Server started');
   }
 }
+
+let transportType: string = '';
 
 // Handle CLI arguments
 if (process.argv.includes('--help') || process.argv.includes('-h')) {
@@ -128,9 +135,14 @@ if (process.argv.includes('--version') || process.argv.includes('-v')) {
   process.exit(0);
 }
 
+if (process.argv.includes('HTTP') || process.argv.includes('http')) {
+  console.log('HTTP server starting...');
+  transportType = 'http';
+}
+
 // Start the server
 const server = new CodingAgentMCPServer();
-server.start().catch((error) => {
+server.start(transportType).catch((error) => {
   console.error('Failed to start server:', error);
   process.exit(1);
 });
