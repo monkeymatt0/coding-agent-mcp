@@ -11,6 +11,7 @@
 </p>
 
 A comprehensive Model Context Protocol (MCP) server that provides coding agent capabilities including file operations, terminal commands, search functionality, and utility operations.
+This is a fork of the original project, I updated the code to use it in one of my portfolio project.
 
 ## Features
 
